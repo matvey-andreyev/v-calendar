@@ -111,6 +111,8 @@ export default {
         class: [
           'vc-day',
           ...this.day.classes,
+          { 'is-past': this.isDayPast },
+          { 'is-in-available-dates': this.isInAvailableDates },
           { 'vc-day-box-center-center': !this.$scopedSlots['day-content'] },
           { 'is-not-in-month': !this.inMonth },
         ],
@@ -171,6 +173,10 @@ export default {
     hasPopovers() {
       return !!arrayHasItems(this.popovers);
     },
+    isDayPast() {
+      const now = new Date();
+      return this.day.range.end.getTime() <= now.getTime();
+    },
     dayContentClass() {
       return [
         'vc-day-content vc-focusable',
@@ -194,6 +200,19 @@ export default {
         'aria-disabled': this.day.isDisabled ? 'true' : 'false',
         role: 'button',
       };
+    },
+    isInAvailableDates() {
+      if (!this.availableDates) {
+        return null;
+      }
+
+      const isStartOk = this.day.range.start.getTime() >= this.availableDates.start.getTime();
+      let isEndOk = true;
+      if (this.availableDates.end) {
+        isEndOk = this.day.range.end.getTime() <= this.availableDates.end.getTime();
+      }
+
+      return isStartOk && isEndOk;
     },
     dayEvent() {
       return {
